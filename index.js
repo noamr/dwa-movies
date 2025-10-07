@@ -9,8 +9,6 @@ dotenv.config();
 
 const {TMDB_TOKEN} = process.env;
 
-import { verify_key } from "./tmdb.js";
-
 const app = express();
 app.use("/", express.static("public"));
 app.use(cookieParser());

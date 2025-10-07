@@ -133,3 +133,10 @@
             display: none;
         }
     }
+
+    html[data-supported=false] #no-support {
+        position: fixed;
+        inset: 0;
+        background: yellow;
+    }
+

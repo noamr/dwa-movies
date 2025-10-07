@@ -1,3 +1,5 @@
+document.documentElement.dataset.supported = ("patchAll" in document) && ("routeMap" in document);
+
 const worker = new Worker("/worker.js", {type: "module"});
 /**
  *
@@ -16,6 +18,7 @@ await new Promise(resolve => worker.addEventListener("message", () => {
 }));
 
 patch_navigation(location.href);
+
 
 window.navigation.addEventListener("navigate", e => {
     const {promise, resolve} = Promise.withResolvers();
