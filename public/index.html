@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="routemap">
+    {"routes":
+      [
+          { "name": "home", "pattern": {"pathname": "/" }},
+          { "name": "search", "pattern": {"pathname": "/search" }},
+          { "name": "movie-details", "pattern": {"pathname": "/movie/:movieid" }},
+          { "name": "person-details", "pattern": {"pathname": "/person/:personid"}}
+      ]
+  }
+    </script>
+  <script type=module src="/main.js">
+  </script>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <header id="header">
+    <nav class="top-nav" id="top-nav">
+      <a href="/" class="logo">Home</a>
+      <a href="/search" class="search-icon">Search</a>
+    </nav>
+    <nav id="genre-selector">
+      <button command="open" commandfor="menu">
+        Menu
+      </button>
+      <ul id="genre-list">
+
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+  </main>
+
+  <footer>
+    <nav id="action-nav">
+      <a href="/">Home</a>
+      <a href="/lists">Lists</a>
+      <a href="/me">Me</a>
+    </nav>
+  </footer>
+
+  <dialog id="search">
+    <form name="search">
+      <label>Search
+        <input type="search" />
+      </label>
+      <input type="submit" value="Go" />
+    </form>
+    <div outletid="search-results">
+
+    </div>
+  </dialog>
+</body>
+
+</html>
