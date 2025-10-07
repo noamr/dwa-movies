@@ -99,7 +99,7 @@ try {
         const {success} = await (await fetch("https://api.themoviedb.org/3//authentication", {headers: {Authorization: `Bearer ${TMDB_TOKEN}`}})).json();
         if (success) {
             console.log("TMDB_TOKEN verified");
-            await new Promise(resolve => app.listen(3000, resolve));
+            await new Promise(resolve => app.listen(process.env.port || 3000, resolve));
             console.log("Server started");
         }
         else {
