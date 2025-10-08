@@ -148,9 +148,9 @@ if (current_movie) {
     if (current_list) {
         function movie_slide({id,title, poster_path, overview}) {
             return `<article class="movie-details">
-                            <h1>${title}</h1>
-                            <img class="hero" src="${image_path(poster_path, 300)}" width="300">
-                            <p class="overview">${overview}</p>
+                        <h1>${title}</h1>
+                        <img class="hero" src="${image_path(poster_path, 300)}" width="300">
+                        <p class="overview">${overview}</p>
                         <a href="/movie/${id}?list=${current_list}" class="snap-to-activate">&nbsp;</a>
                     </article>
             `;
