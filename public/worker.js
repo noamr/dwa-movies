@@ -26,7 +26,7 @@ console.log("Worker ready");
 
 postMessage("ready");
 
-self.addEventListener("message", e => {
+self.addEventListener("message", async e => {
     const {request, stream} = e.data;
     const writer = stream.getWriter();
     const url = new URL(request.url);
@@ -34,8 +34,8 @@ self.addEventListener("message", e => {
     const all = [];
 
     function get_movie_list(url, outlet) {
-        return tmdb_get(url).then(({results}) => {
-            writer.write(`
+        return tmdb_get(url).then(async ({results}) => {
+           await writer.write(`
       <template patchfor="list-${outlet}">
          <ul class=movie-list>
         ${results.filter(({genre_ids}) => (genre === "all" ? true : genre_ids.includes(+genre))).map(({id, poster_path, title}) => `
@@ -53,8 +53,8 @@ self.addEventListener("message", e => {
         });
     }
 
-    all.push(tmdb_get("/genre/movie/list").then(({genres}) => {
-        writer.write(`
+    all.push(tmdb_get("/genre/movie/list").then(async ({genres}) => {
+        await writer.write(`
             <template patchfor=genre-list>
                 <li><a href="?genre=all" id="genre-all">All</a></li>
                 ${genres.map(({id, name}) => `<li><a href=?genre=${id}>${name}</a></li>`).join("\n")}
@@ -90,7 +90,7 @@ self.addEventListener("message", e => {
 
 const current_movie = new URLPattern("/movie/:id", url.href).exec(url)?.pathname?.groups?.id;
 if (current_movie) {
-    all.push(tmdb_get(`/movie/${current_movie}`).then(({
+    await tmdb_get(`/movie/${current_movie}`).then(async ({
         backdrop_path,
         genres,
         homepage,
@@ -99,7 +99,7 @@ if (current_movie) {
         overview,
         poster_path
     }) => {
-        writer.write(`
+        await writer.write(`
     <template patchfor="main">
         <ul class="movie-carousel">
         <li id="prev-movie"></li>
@@ -123,8 +123,8 @@ if (current_movie) {
             <li id="next-movie"></li>
         </ul>
     </template>
-    `);
-    }));
+    `) });
+
 
    all.push(tmdb_get(`/movie/${current_movie}/credits`).then(({cast}) => {
     writer.write(`
@@ -144,43 +144,43 @@ if (current_movie) {
    }));
 
 
-    all.push(get_movie_list(`/movie/${current_movie}/similar`, "similar"));
-    all.push(get_movie_list(`/movie/${current_movie}/recommendations`, "recommendations"));
-
     const current_list = url.searchParams.get("list");
     if (current_list) {
         function movie_slide({id,title, poster_path, overview}) {
-            return `
-                    <article class="movie-details">
+            return `<article class="movie-details">
                             <h1>${title}</h1>
                             <img class="hero" src="${image_path(poster_path, 300)}" width="300">
                             <p class="overview">${overview}</p>
-                        <a href="/movie/${id}?list=${current_list}" class="snap-to-activate">
+                        <a href="/movie/${id}?list=${current_list}" class="snap-to-activate">&nbsp;</a>
                     </article>
             `;
         }
-        all.push(tmdb_get(current_list).then(({results}) => {
+        all.push(tmdb_get(current_list).then(async ({results}) => {
             const index = results.findIndex(r => r.id == current_movie);
-            console.log({results, current_movie, index})
             if (index < results.length - 1) {
                 const next = results[index + 1];
-                writer.write(`
+                console.log({next})
+                await writer.write(`
                     <template patchfor="next-movie">
                         ${movie_slide(next)}
                     </template>
                 `);
             }
             if (index > 0) {
-                const next = results[index - 1];
-                writer.write(`
+                const prev = results[index - 1];
+                await writer.write(`
                     <template patchfor="prev-movie">
-                        ${movie_slide(next)}
+                        ${movie_slide(prev)}
                     </template>
                 `);
             }
         }));
     }
+    all.push(get_movie_list(`/movie/${current_movie}/similar`, "similar"));
+    all.push(get_movie_list(`/movie/${current_movie}/recommendations`, "recommendations"));
 }
 
-Promise.all(all).then(() => writer.close());
+Promise.all(all).then(() => {
+    writer.close();
+});
 });

@@ -8,7 +8,6 @@ let did_snap_by_user = false;
  * @param {Request} request
  */
 async function patch_navigation(url) {
-    await current_navigation;
     const {promise, resolve} = Promise.withResolvers();
     document.startViewTransition(() => promise);
     current_navigation = promise;
@@ -36,7 +35,6 @@ document.addEventListener("scrollsnapchange", e => {
         return;
     }
     const snapped = e.snapTargetInline.querySelector(".snap-to-activate");
-    console.log({e, snapped})
     if (snapped)
         snapped.click();
 }, {capture: true})
