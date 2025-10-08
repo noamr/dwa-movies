@@ -1,4 +1,6 @@
 body {
+    margin: 0;
+
     >header {
         >nav.top-nav {
             flex: 1;
@@ -201,4 +203,13 @@ ul {
 
 :is(#prev-movie, #next-movie):empty {
     display: none;
+}
+
+section.movies {
+    padding-left: 10px;
+}
+
+.hero {
+    width: 300px;
+    height: 450px;
 }

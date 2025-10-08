@@ -65,19 +65,19 @@ self.addEventListener("message", e => {
     if (new URLPattern("/", url.href).test(url)) {
         writer.write(`
   <template patchfor="main">
-    <section>
+    <section class=movies>
       <h2>Now Playing</h2>
       <div id="list-now_playing"></div>
     </section>
-    <section>
+    <section class=movies>
       <h2>Popular</h2>
       <div id="list-popular"></div>
     </section>
-    <section>
+    <section class=movies>
       <h2>Top Rated</h2>
       <div id="list-top_rated"></div>
     </section>
-    <section>
+    <section class=movies>
       <h2>Upcoming</h2>
       <div id="list-upcoming"></div>
     </section>
@@ -106,15 +106,15 @@ if (current_movie) {
             <li class="default-item">
                 <article class="movie-details">
                     <h1>${title}</h1>
-                    <img class="hero" src="${image_path(poster_path, 300)}" width="300 />
+                    <img class="hero" src="${image_path(poster_path, 300)}" width="300" />
                     <p class="overview">${overview}</p>
                     <section id="cast">
                     </section>
-                    <section>
+                    <section class=movies>
                     <h2>Related</h2>
                     <div id="list-similar"></div>
                     </section>
-                    <section>
+                    <section class=movies>
                     <h2>Recommended</h2>
                     <div id="list-recommendations"></div>
                     </section>
@@ -154,7 +154,7 @@ if (current_movie) {
                     <article class="movie-details">
                             <h1>${title}</h1>
                             <img class="hero" src="${image_path(poster_path, 300)}" width="300">
-                            <p class=overview>${overview}</p>
+                            <p class="overview">${overview}</p>
                         <a href="/movie/${id}?list=${current_list}" class="snap-to-activate">
                     </article>
             `;
