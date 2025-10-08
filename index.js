@@ -10,13 +10,17 @@ dotenv.config();
 const {TMDB_TOKEN} = process.env;
 
 const app = express();
-app.use("/", express.static("public"));
+const serve_static_asset = express.static("public");
 app.use(cookieParser());
 
+const shell_path = path.join(import.meta.dirname, 'public', 'index.html');
 
-app.get("/movie/:id", async (req, res) => {
-  const filePath = path.join(import.meta.dirname, 'public', 'index.html');
-  res.sendFile(filePath);
+app.use("/", (req, res, next) => {
+  if (req.headers["sec-fetch-mode"] === "navigate") {
+    res.sendFile(shell_path);
+  } else {
+    serve_static_asset(req, res, next);
+  }
 });
 
 app.get('/api/session', (req, res) => {

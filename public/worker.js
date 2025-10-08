@@ -26,13 +26,21 @@ console.log("Worker ready");
 
 postMessage("ready");
 
-function movie_list(name, genre, results) {
-    return `
-      <template patchfor="list-${name}">
+self.addEventListener("message", e => {
+    const {request, stream} = e.data;
+    const writer = stream.getWriter();
+    const url = new URL(request.url);
+    const genre = url.searchParams.get("genre") || "all";
+    const all = [];
+
+    function get_movie_list(url, outlet) {
+        return tmdb_get(url).then(({results}) => {
+            writer.write(`
+      <template patchfor="list-${outlet}">
          <ul class=movie-list>
-        ${results.filter(({genre_ids}) => (genre === "all" ? true : genre_ids.includes(+genre))).map(({id, poster_path, title,}) => `
+        ${results.filter(({genre_ids}) => (genre === "all" ? true : genre_ids.includes(+genre))).map(({id, poster_path, title}) => `
             <li>
-                <a href="/movie/${id}" class="movie-thumb">
+                <a href="/movie/${id}?list=${encodeURIComponent(url)}" class="movie-thumb">
                     <img class=thumb src="${image_path(poster_path, 200)}">
                     <span class=title>${title}</span>
                 </a>
@@ -41,14 +49,10 @@ function movie_list(name, genre, results) {
         </ul>
   </template>
     `
-}
+);
+        });
+    }
 
-self.addEventListener("message", e => {
-    const {request, stream} = e.data;
-    const writer = stream.getWriter();
-    const url = new URL(request.url);
-    const genre = url.searchParams.get("genre") || "all";
-    const all = [];
     all.push(tmdb_get("/genre/movie/list").then(({genres}) => {
         writer.write(`
             <template patchfor=genre-list>
@@ -80,10 +84,7 @@ self.addEventListener("message", e => {
   </template>
         `);
     for (const list of ["top_rated", "popular", "upcoming", "now_playing"]) {
-        all.push(tmdb_get(`/movie/${list}`).then(({results}) => {
-            writer.write(movie_list(list, genre, results));
-        }));
-
+        all.push(get_movie_list(`/movie/${list}`, list));
     }
 }
 
@@ -100,19 +101,27 @@ if (current_movie) {
     }) => {
         writer.write(`
     <template patchfor="main">
-        <article class="movie-details">
-            <h1>${title}</h1>
-            <img class="hero" src="${image_path(poster_path, 300)}" width="300 />
-            <p class="overview">${overview}</p>
-            <section id="cast">
-            </section>
-            <section>
-            <h2>Related</h2>
-            </section>
-            <section>
-            <h2>Recommended</h2>
-            </section>
-        </article>
+        <ul class="movie-carousel">
+        <li id="prev-movie"></li>
+            <li class="default-item">
+                <article class="movie-details">
+                    <h1>${title}</h1>
+                    <img class="hero" src="${image_path(poster_path, 300)}" width="300 />
+                    <p class="overview">${overview}</p>
+                    <section id="cast">
+                    </section>
+                    <section>
+                    <h2>Related</h2>
+                    <div id="list-similar"></div>
+                    </section>
+                    <section>
+                    <h2>Recommended</h2>
+                    <div id="list-recommendations"></div>
+                    </section>
+                </article>
+            </li>
+            <li id="next-movie"></li>
+        </ul>
     </template>
     `);
     }));
@@ -132,7 +141,45 @@ if (current_movie) {
         </ul>
     </template>
         `);
-   }))
+   }));
+
+
+    all.push(get_movie_list(`/movie/${current_movie}/similar`, "similar"));
+    all.push(get_movie_list(`/movie/${current_movie}/recommendations`, "recommendations"));
+
+    const current_list = url.searchParams.get("list");
+    if (current_list) {
+        function movie_slide({id,title, poster_path, overview}) {
+            return `
+                    <article class="movie-details">
+                            <h1>${title}</h1>
+                            <img class="hero" src="${image_path(poster_path, 300)}" width="300">
+                            <p class=overview>${overview}</p>
+                        <a href="/movie/${id}?list=${current_list}" class="snap-to-activate">
+                    </article>
+            `;
+        }
+        all.push(tmdb_get(current_list).then(({results}) => {
+            const index = results.findIndex(r => r.id == current_movie);
+            console.log({results, current_movie, index})
+            if (index < results.length - 1) {
+                const next = results[index + 1];
+                writer.write(`
+                    <template patchfor="next-movie">
+                        ${movie_slide(next)}
+                    </template>
+                `);
+            }
+            if (index > 0) {
+                const next = results[index - 1];
+                writer.write(`
+                    <template patchfor="prev-movie">
+                        ${movie_slide(next)}
+                    </template>
+                `);
+            }
+        }));
+    }
 }
 
 Promise.all(all).then(() => writer.close());
