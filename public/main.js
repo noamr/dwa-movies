@@ -44,7 +44,7 @@ document.addEventListener("scrollsnapchange", e => {
 window.navigation.addEventListener("navigate", e => {
     if (e.canIntercept) {
         e.intercept({
-            async handler() {
+            async precommitHandler() {
                 await patch_navigation(e.destination.url);
             }
         })
