@@ -217,20 +217,12 @@ section.movies {
 }
 
 .default-item .hero {
-    view-transition-name: poster;
-
-    @route (from: movie-details) {
-            @route (to: movie-details) {
-            & {
-                view-transition-name: none;
-            }
+    @route (from: home) {
+        @route (to: movie-details) {
+            view-transition-name: hero;
         }
-    }
-    @route (from: person-details) {
-            @route (to: person-details) {
-            & {
-                view-transition-name: none;
-            }
+        @route (to: person-details) {
+            view-transition-name: hero;
         }
     }
 }
