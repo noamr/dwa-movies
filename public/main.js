@@ -39,29 +39,49 @@ document.addEventListener("scrollsnapchange", e => {
 }, {capture: true})
 
 window.navigation.addEventListener("navigate", e => {
+    const from = location.href;
+    const links_to_cleanup = new Set();
     if (e.canIntercept) {
         if (e.sourceElement) {
-            e.sourceElement.classList.add("nav-source");
+            e.sourceElement.classList.add("nav-trigger");
+            links_to_cleanup.add(e.sourceElement);
+        }
+        for (const a of document.querySelectorAll("a[href]")) {
+            if (a.href === e.destination.url) {
+                a.classList.add("nav-dest");
+                a.classList.add("nav");
+                links_to_cleanup.add(a);
+            }
         }
         e.intercept({
             precommitHandler() {
                 const {promise, resolve} = Promise.withResolvers();
-                document.startViewTransition(() => {
+                const transition = document.startViewTransition(() => {
                     resolve();
                     return navigation.transition.finished;
+                });
+                Promise.allSettled([transition.finished]).then(() => {
+                    for (const a of links_to_cleanup) {
+                        a.classList.remove("nav");
+                        a.classList.remove("nav-source");
+                        a.classList.remove("nav-dest");
+                        a.classList.remove("nav-trigger");
+                    }
                 });
                 return promise;
             },
 
             async handler() {
                 await patch_navigation(e.destination.url);
+                for (const a of document.querySelectorAll("a[href]")) {
+                    if (a.href === from) {
+                        a.classList.add("nav-dest");
+                        a.classList.add("nav");
+                        links_to_cleanup.add(a);
+                        break;
+                    }
+                }
             }
         })
-        const cleanup = () => {
-            if (e.sourceElement)
-                e.sourceElement.classList.remove("nav-source");
-         }
-         navigation.addEventListener("navigateerror", cleanup, {once: true});
-         navigation.addEventListener("navigatesuccess", cleanup, {once: true});
     }
 });

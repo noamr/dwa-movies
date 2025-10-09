@@ -71,23 +71,24 @@ body {
     li {
         list-style: none;
         margin-right: 20px;
-        border-radius: 20% 10%;
-        overflow: hidden;
         min-width: 200px;
         height: 300px;
-        border: 2px solid black;
-        box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
         display: grid;
-
-        &:focus-within {
-            outline: 4px solid orange;
-            outline-offset: 4px;
-        }
 
         a.movie-thumb {
             text-decoration: none;
             position: relative;
             grid-area: 1/1/2/2;
+            border-radius: 20% 10%;
+            corner-shape: superellipse(1.2);
+            box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+            overflow: hidden;
+            border: 2px solid black;
+
+            &:focus-within {
+                outline: 4px solid orange;
+                outline-offset: 4px;
+            }
 
             .thumb {
                 position: absolute;
@@ -129,7 +130,7 @@ h1 {
     max-width: 80svw;
 }
 
-.movie-details {
+.movie-details, .person-details {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -204,6 +205,10 @@ section.movies {
 .hero {
     width: 300px;
     height: 450px;
+    border-radius: 20% 10%;
+    corner-shape: superellipse(1.2);
+    box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+    border: 2px solid black;
 }
 
 @view-transition {
@@ -211,18 +216,67 @@ section.movies {
 }
 
 @route (home) {
-    a.nav-source {
+    a:is(.nav-trigger, .nav-dest):has(img) {
         view-transition-name: poster;
+
+        .title {
+            view-transition-name: title;
+        }
     }
 }
 
 .default-item .hero {
-    @route (from: home) {
+            view-transition-name: poster;
+    @route (from: movie-details) {
         @route (to: movie-details) {
-            view-transition-name: hero;
+            view-transition-name: none;
         }
+    }
+
+    @route (from: person-details) {
         @route (to: person-details) {
-            view-transition-name: hero;
+            view-transition-name: none;
+        }
+    }
+}
+
+.default-item h1 {
+    view-transition-name: title;
+    @route (from: movie-details) {
+        @route (to: movie-details) {
+            view-transition-name: none;
+        }
+    }
+
+    @route (from: person-details) {
+        @route (to: person-details) {
+            view-transition-name: none;
+        }
+    }
+}
+
+@route (from: movie-details) {
+    @route (to: movie-details) {
+        ::view-transition-image-pair(poster) {
+            animation: none;
+        }
+    }
+}
+
+
+@route (from: person-details) {
+    @route (to: person-details) {
+        :root {
+            view-transition-name: rerfreshy;
+        }
+    }
+}
+
+
+@route (from: movie-details) {
+    @route (to: movie-details) {
+        :root {
+            view-transition-name: rerfreshy;
         }
     }
 }
