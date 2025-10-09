@@ -137,7 +137,7 @@ if (current_movie) {
         <ul class=cast>
             ${cast.map(({id, name, character, profile_path}) => `
                 <li class=cast>
-                    <a href="/person/${id}">
+                    <a href="/person/${id}?list=${encodeURIComponent(`/movie/${current_movie}/credits`)}">
                         <img class="person thumb" src="${image_path(profile_path, 300)}" width=75>
                         <span>${name}</span> as <span>${character}</span>
                     </a>
@@ -183,6 +183,90 @@ if (current_movie) {
     }
     all.push(get_movie_list(`/movie/${current_movie}/similar`, "similar"));
     all.push(get_movie_list(`/movie/${current_movie}/recommendations`, "recommendations"));
+}
+
+const current_person = new URLPattern("/person/:id", url.href).exec(url)?.pathname?.groups?.id;
+if (current_person) {
+    const {
+        name,
+        biography,
+        profile_path
+    } = await tmdb_get(`/person/${current_person}`);
+
+    await writer.write(`
+    <template patchfor="main">
+        <ul class="person-carousel">
+        <li id="prev-person"></li>
+            <li class="default-item">
+                <article class="person-details">
+                    <h1>${name}</h1>
+                    <img class="hero" src="${image_path(profile_path, 300)}" width="300" />
+                    <p class="overview">${biography}</p>
+                    <section id="cast">
+                    </section>
+                    <section class=movies>
+                    <h2>Credits</h2>
+                    <div id="credits"></div>
+                    </section>
+                </article>
+            </li>
+            <li id="next-person"></li>
+        </ul>
+    </template>
+    `);
+
+
+   all.push(tmdb_get(`/person/${current_person}/credits`).then(async ({cast}) => {
+    await writer.write(`
+    <template patchfor="cast">
+        <ul class=cast>
+            ${cast.map(({title, poster_path, id, character}) => `
+                <li class=cast>
+                    <a href="/movie/${id}">
+                        <img class="movie thumb" src="${image_path(poster_path, 300)}" width=75>
+                        <span>As ${character}</span> in <span>${title}</span>
+                    </a>
+                </li>
+            `).join("")}
+        </ul>
+    </template>
+        `);
+   }));
+
+
+    const current_list = url.searchParams.get("list");
+    if (current_list) {
+        function person_slide({id, name, profile_path}) {
+            console.log
+            return `<article class="person-details">
+                        <h1>${name}</h1>
+                        <img class="hero" src="${image_path(profile_path, 300)}" width="300">
+                        <a href="/person/${id}?list=${current_list}" class="snap-to-activate">&nbsp;</a>
+                    </article>
+            `;
+        }
+        all.push(tmdb_get(current_list).then(async ({cast}) => {
+            const results = cast;
+            const index = results.findIndex(r => r.id == current_person);
+            if (index < results.length - 1) {
+                const next = results[index + 1];
+                console.log({next})
+                await writer.write(`
+                    <template patchfor="next-person">
+                        ${person_slide(next)}
+                    </template>
+                `);
+            }
+            if (index > 0) {
+                const prev = results[index - 1];
+                await writer.write(`
+                    <template patchfor="prev-person">
+                        ${person_slide(prev)}
+                    </template>
+                `);
+            }
+        }));
+    }
 }
 
 Promise.all(all).then(() => {

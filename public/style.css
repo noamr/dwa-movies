@@ -108,7 +108,7 @@ body {
     }
 }
 
-.movie-carousel {
+.movie-carousel, .person-carousel {
     max-width: 100svw;
     overflow-x: scroll;
     display: flex;
@@ -218,8 +218,19 @@ section.movies {
 
 .default-item .hero {
     view-transition-name: poster;
-}
-@route (from: movie-details) {
-    view-transition-name: none;
-}
 
+    @route (from: movie-details) {
+            @route (to: movie-details) {
+            & {
+                view-transition-name: none;
+            }
+        }
+    }
+    @route (from: person-details) {
+            @route (to: person-details) {
+            & {
+                view-transition-name: none;
+            }
+        }
+    }
+}
