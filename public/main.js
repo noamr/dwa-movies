@@ -9,7 +9,6 @@ let did_snap_by_user = false;
  */
 async function patch_navigation(url) {
     const {promise, resolve} = Promise.withResolvers();
-    document.startViewTransition(() => promise);
     current_navigation = promise;
     const {readable, writable} = new TransformStream();
     worker.postMessage({request: {
@@ -41,10 +40,28 @@ document.addEventListener("scrollsnapchange", e => {
 
 window.navigation.addEventListener("navigate", e => {
     if (e.canIntercept) {
+        if (e.sourceElement) {
+            e.sourceElement.classList.add("nav-source");
+        }
         e.intercept({
-            async precommitHandler() {
+            precommitHandler() {
+                const {promise, resolve} = Promise.withResolvers();
+                document.startViewTransition(() => {
+                    resolve();
+                    return navigation.transition.finished;
+                });
+                return promise;
+            },
+
+            async handler() {
                 await patch_navigation(e.destination.url);
             }
         })
+        const cleanup = () => {
+            if (e.sourceElement)
+                e.sourceElement.classList.remove("nav-source");
+         }
+         navigation.addEventListener("navigateerror", cleanup, {once: true});
+         navigation.addEventListener("navigatesuccess", cleanup, {once: true});
     }
 });

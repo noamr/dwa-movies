@@ -210,3 +210,16 @@ section.movies {
     navigation: auto;
 }
 
+@route (home) {
+    a.nav-source {
+        view-transition-name: poster;
+    }
+}
+
+.default-item .hero {
+    view-transition-name: poster;
+}
+@route (from: movie-details) {
+    view-transition-name: none;
+}
+
