@@ -21,22 +21,14 @@ body {
             }
         }
 
-        >#genre-selector {
-            display: flex;
-            max-width: 100%;
-            overflow-x: scroll;
-            scrollbar-width: 0;
-
             button[commandfor=menu] {
                 appearance: none;
                 border-radius: 3px;
             }
 
-            #genre-list {
-                display: flex;
-                scrollbar-width: 0;
-                margin: 0;
+            >#genre-selector {
 
+            #genre-list {
                 @route (movie-details) {
                     display: none;
                 }
@@ -217,3 +209,4 @@ section.movies {
 @view-transition {
     navigation: auto;
 }
+

@@ -23,15 +23,7 @@
   <header id="header">
     <nav class="top-nav" id="top-nav">
       <a href="/" class="logo">Home</a>
-      <a href="/search" class="search-icon">Search</a>
-    </nav>
-    <nav id="genre-selector">
-      <button command="open" commandfor="menu">
-        Menu
-      </button>
-      <ul id="genre-list">
-
-      </ul>
+      <button commandfor="search" command="toggle-popover">Search</button>
     </nav>
   </header>
 
@@ -53,17 +45,17 @@
     </nav>
   </footer>
 
-  <dialog id="search">
+  <section id="search" popover>
     <form name="search">
       <label>Search
-        <input type="search" />
+        <input type="search" autofocus />
       </label>
       <input type="submit" value="Go" />
     </form>
     <div outletid="search-results">
 
     </div>
-  </dialog>
+  </section>
 </body>
 
 </html>

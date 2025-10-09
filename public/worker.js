@@ -30,15 +30,14 @@ self.addEventListener("message", async e => {
     const {request, stream} = e.data;
     const writer = stream.getWriter();
     const url = new URL(request.url);
-    const genre = url.searchParams.get("genre") || "all";
     const all = [];
 
     function get_movie_list(url, outlet) {
-        return tmdb_get(url).then(async ({results}) => {
+        return tmdb_get(url).then(async ({results, success}) => {
            await writer.write(`
       <template patchfor="list-${outlet}">
          <ul class=movie-list>
-        ${results.filter(({genre_ids}) => (genre === "all" ? true : genre_ids.includes(+genre))).map(({id, poster_path, title}) => `
+        ${results.map(({id, poster_path, title}) => `
             <li>
                 <a href="/movie/${id}?list=${encodeURIComponent(url)}" class="movie-thumb">
                     <img class=thumb src="${image_path(poster_path, 200)}">
@@ -52,16 +51,6 @@ self.addEventListener("message", async e => {
 );
         });
     }
-
-    all.push(tmdb_get("/genre/movie/list").then(async ({genres}) => {
-        await writer.write(`
-            <template patchfor=genre-list>
-                <li><a href="?genre=all" id="genre-all">All</a></li>
-                ${genres.map(({id, name}) => `<li><a href=?genre=${id}>${name}</a></li>`).join("\n")}
-            </template>
-        `);
-    }));
-
     if (new URLPattern("/", url.href).test(url)) {
         writer.write(`
   <template patchfor="main">
@@ -81,11 +70,27 @@ self.addEventListener("message", async e => {
       <h2>Upcoming</h2>
       <div id="list-upcoming"></div>
     </section>
+    <section id=genres>
+    </section>
   </template>
         `);
     for (const list of ["top_rated", "popular", "upcoming", "now_playing"]) {
         all.push(get_movie_list(`/movie/${list}`, list));
     }
+
+    all.push(tmdb_get("/genre/movie/list").then(async ({genres}) => {
+        await writer.write(`
+            <template patchfor=genres>
+                ${genres.map(({id, name}) => `<section class=movies id=genre-${id}>
+                    <h2>${name}</h2>
+                    <div id="list-genre-${id}"></div>
+                </section>`).join("")}
+            </template>
+        `);
+
+        await Promise.all(genres.map(async ({id}) => get_movie_list(`/discover/movie?with_genres=${id}`, `genre-${id}`)))
+    }));
+
 }
 
 const current_movie = new URLPattern("/movie/:id", url.href).exec(url)?.pathname?.groups?.id;
