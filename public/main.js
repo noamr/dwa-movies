@@ -7,35 +7,30 @@ async function patch_navigation(url) {
     await readable.pipeTo(document.body.streamAppendHTMLUnsafe());
 }
 
-await new Promise(resolve => worker.addEventListener("message", () => {
-    resolve();
-}));
+worker.addEventListener("message", async () => {
+    await patch_navigation(location.href);
 
-patch_navigation(location.href);
+    document.addEventListener("scrollsnapchange", e => {
+        e.snapTargetInline.querySelector(".snap-to-activate")?.click();
+    }, { capture: true });
 
-document.addEventListener("scrollsnapchange", e => {
-    const snapped = e.snapTargetInline.querySelector(".snap-to-activate");
-    if (snapped)
-        snapped.click();
-}, { capture: true })
+    window.navigation.addEventListener("navigate", e => {
+        if (e.canIntercept) {
+            e.intercept({
+                async handler() {
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                    const { promise, resolve } = Promise.withResolvers();
+                    return document.startViewTransition({
+                        async update() {
+                            resolve();
+                            await patch_navigation(e.destination.url)
+                        },
 
-window.navigation.addEventListener("navigate", e => {
-    if (e.canIntercept) {
-        const is_snap_to_activate = e.sourceElement?.classList?.contains("snap-to-activate") ?? false;
-        console.log({is_snap_to_activate})
-        e.intercept({
-            async handler() {
-                await new Promise(resolve => requestAnimationFrame(resolve));
-                const { promise, resolve } = Promise.withResolvers();
-                return document.startViewTransition({
-                    async update() {
-                        resolve();
-                        await patch_navigation(e.destination.url)
-                    },
+                        types: [e.sourceElement?.classList?.contains("snap-to-activate") ? "instant" : "default"]
+                    }).finished;
+                }
+            })
+        }
+    });
+}, { once: true });
 
-                    types: [is_snap_to_activate ? "instant" : "default"]
-                }).finished;
-            }
-        })
-    }
-});
