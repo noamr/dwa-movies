@@ -19,13 +19,8 @@ worker.addEventListener("message", async () => {
             e.intercept({
                 async handler() {
                     await new Promise(resolve => requestAnimationFrame(resolve));
-                    const { promise, resolve } = Promise.withResolvers();
                     return document.startViewTransition({
-                        async update() {
-                            resolve();
-                            await patch_navigation(e.destination.url)
-                        },
-
+                        update: () => patch_navigation(e.destination.url),
                         types: [e.sourceElement?.classList?.contains("snap-to-activate") ? "instant" : "default"]
                     }).finished;
                 }

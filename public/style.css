@@ -1,3 +1,6 @@
+/* =========================================
+   Routes
+   ========================================= */
 @route --home {
   pathname: "/";
 }
@@ -9,75 +12,150 @@
 @route --person-details {
   pathname: "/person/:person";
 }
+
+/* =========================================
+   Base & Reset
+   ========================================= */
+:root {
+  font-family: roboto;
+}
+
 body {
   margin: 0;
   font-family: roboto;
+}
 
-  > header {
-    > nav.top-nav {
-      flex: 1;
-      display: grid;
-      grid-template-areas: "logo . search-icon";
-      grid-template-columns: min-content 1fr min-content;
+ul {
+  margin: 0;
+  padding: 0;
+}
 
-      .logo {
-        grid-area: logo;
+li {
+  list-style: none;
+}
 
-        @navigation (at: url-pattern("/")) {
-          display: none;
-        }
-      }
+a {
+  color: black;
+}
 
-      .search-icon {
-        grid-area: search;
+h1 {
+  text-wrap: wrap;
+  margin: 10px;
+}
+
+h2 {
+  text-align: left;
+}
+
+/* Shared Component Styles */
+h1, .overview {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  corner-shape: bevel;
+  box-shadow: 2px 2px 1px 3px black;
+}
+
+/* =========================================
+   Layout
+   ========================================= */
+body > header {
+  /* Navigation Container */
+  > nav.top-nav {
+    flex: 1;
+    display: grid;
+    grid-template-areas: "logo . search-icon";
+    grid-template-columns: min-content 1fr min-content;
+
+    .logo {
+      grid-area: logo;
+
+      @navigation (at: --home) {
+        display: none;
       }
     }
 
-    button[commandfor="menu"] {
-      appearance: none;
-      border-radius: 3px;
-    }
-
-    > #genre-selector {
-      #genre-list {
-        @navigation (at: movie-details) {
-          display: none;
-        }
-
-        li {
-          list-style: none;
-          white-space: nowrap;
-          margin: 3px;
-          padding: 3px;
-          border-radius: 3px;
-          border: 1px solid black;
-
-          a {
-            text-decoration: none;
-          }
-        }
-      }
+    .search-icon {
+      grid-area: search;
     }
   }
 
-  > footer {
-    position: fixed;
-    bottom: 0;
+  /* Menu Button */
+  button[commandfor="menu"] {
+    appearance: none;
+    border-radius: 3px;
+  }
 
-    > nav {
-      display: flex;
+  /* Genre Selector */
+  > #genre-selector {
+    #genre-list {
+      @navigation (at: movie-details) {
+        display: none;
+      }
+
+      li {
+        list-style: none;
+        white-space: nowrap;
+        margin: 3px;
+        padding: 3px;
+        border-radius: 3px;
+        border: 1px solid black;
+
+        a {
+          text-decoration: none;
+        }
+      }
     }
   }
 }
 
+body > footer {
+  position: fixed;
+  bottom: 0;
+
+  > nav {
+    display: flex;
+  }
+}
+
+main > .movie-carousel,
+main > .person-carousel {
+  scroll-timeline-name: --carousel;
+  scroll-timeline-axis: inline;
+}
+
+section {
+  align-self: flex-start;
+}
+
+section.movies {
+  padding-left: 10px;
+}
+
+/* =========================================
+   Components
+   ========================================= */
+
+/* Hero */
+.hero {
+  width: 300px;
+  height: 450px;
+  border-radius: 20% 10%;
+  corner-shape: superellipse(1.2);
+  box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+  border: 2px solid black;
+}
+
+/* Overview */
 .overview {
   height: 18vh;
   max-width: 90vw;
   font-size: 14px;
   overflow: auto;
-
 }
 
+/* Movie List */
 .movie-list {
   display: flex;
   overflow-x: scroll;
@@ -127,6 +205,7 @@ body {
   }
 }
 
+/* Carousels */
 .movie-carousel,
 .person-carousel {
   max-width: 100svw;
@@ -140,36 +219,7 @@ body {
   }
 }
 
-main > .movie-carousel,
-main > .person-carousel {
-  scroll-timeline-name: --carousel;
-  scroll-timeline-axis: inline;
-}
-
-.teaser a {
-  text-decoration: none;
-}
-
-h1, .overview {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px 20px;
-  border-radius: 10px;
-  box-sizing: border-box;
-  corner-shape: bevel;
-  box-shadow: 2px 2px 1px 3px black;    
-}
-
-
-h1 {
-  text-wrap: wrap;
-
-  margin: 10px;
-}
-
-a {
-    color: black;
-}
-
+/* Details Pages */
 .movie-details,
 .person-details {
   display: flex;
@@ -179,6 +229,7 @@ a {
   max-width: 100svw;
 }
 
+/* Cast */
 .cast {
   display: flex;
   overflow-x: scroll;
@@ -201,12 +252,12 @@ a {
   }
 }
 
-@navigation (movie-details) {
-  #genre-list {
-    display: none;
-  }
+/* Teaser */
+.teaser a {
+  text-decoration: none;
 }
 
+/* No Support Warning */
 #no-support {
   display: none;
 }
@@ -218,40 +269,20 @@ html[data-supported="false"] #no-support {
   background: yellow;
 }
 
-h2 {
-  text-align: left;
-}
-
-section {
-  align-self: flex-start;
-}
-
-li {
-  list-style: none;
-}
-
-ul {
-  margin: 0;
-  padding: 0;
-}
-
+/* Utilities */
 :is(.prev, .next):empty {
   display: none;
 }
 
-section.movies {
-  padding-left: 10px;
+@navigation (movie-details) {
+  #genre-list {
+    display: none;
+  }
 }
 
-.hero {
-  width: 300px;
-  height: 450px;
-  border-radius: 20% 10%;
-  corner-shape: superellipse(1.2);
-  box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
-  border: 2px solid black;
-}
-
+/* =========================================
+   View Transitions & Animations
+   ========================================= */
 @view-transition {
   navigation: auto;
 }
@@ -312,6 +343,7 @@ section.movies {
     opacity: 0;
   }
 }
+
 html::view-transition-group(refreshy) {
   animation-name: effecty;
   animation-duration: 3s;
@@ -335,6 +367,7 @@ html::view-transition-group(refreshy) {
     }
   }
 }
+
 a:link-to(--person-details with navigation-param(person)),
 a:link-to(--movie-details with navigation-param(movie)) {
   .thumb {
