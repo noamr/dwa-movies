@@ -1,282 +1,341 @@
+@route --home {
+  pathname: "/";
+}
+
+@route --movie-details {
+  pathname: "/movie/:movie";
+}
+
+@route --person-details {
+  pathname: "/person/:person";
+}
 body {
-    margin: 0;
+  margin: 0;
+  font-family: roboto;
 
-    >header {
-        >nav.top-nav {
-            flex: 1;
-            display: grid;
-            grid-template-areas: "logo . search-icon";
-            grid-template-columns: min-content 1fr min-content;
+  > header {
+    > nav.top-nav {
+      flex: 1;
+      display: grid;
+      grid-template-areas: "logo . search-icon";
+      grid-template-columns: min-content 1fr min-content;
 
-            .logo {
-                grid-area: logo;
+      .logo {
+        grid-area: logo;
 
-                @route (home) {
-                    display: none;
-                }
-            }
-
-            .search-icon {
-                grid-area: search;
-            }
+        @navigation (at: url-pattern("/")) {
+          display: none;
         }
+      }
 
-            button[commandfor=menu] {
-                appearance: none;
-                border-radius: 3px;
-            }
-
-            >#genre-selector {
-
-            #genre-list {
-                @route (movie-details) {
-                    display: none;
-                }
-
-                li {
-                    list-style: none;
-                    white-space: nowrap;
-                    margin: 3px;
-                    padding: 3px;
-                    border-radius: 3px;
-                    border: 1px solid black;
-
-                    a {
-                        text-decoration: none;
-                    }
-                }
-            }
-        }
-
+      .search-icon {
+        grid-area: search;
+      }
     }
 
-    >footer {
-        position: fixed;
-        bottom: 0;
-
-        >nav {
-            display: flex;
-        }
+    button[commandfor="menu"] {
+      appearance: none;
+      border-radius: 3px;
     }
+
+    > #genre-selector {
+      #genre-list {
+        @navigation (at: movie-details) {
+          display: none;
+        }
+
+        li {
+          list-style: none;
+          white-space: nowrap;
+          margin: 3px;
+          padding: 3px;
+          border-radius: 3px;
+          border: 1px solid black;
+
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+
+  > footer {
+    position: fixed;
+    bottom: 0;
+
+    > nav {
+      display: flex;
+    }
+  }
+}
+
+.overview {
+  height: 18vh;
+  max-width: 90vw;
+  font-size: 14px;
+  overflow: auto;
+
 }
 
 .movie-list {
-    display: flex;
-    overflow-x: scroll;
-    max-width: 100svw;
-    scrollbar-width: 0;
-    height: 320px;
-    padding: 10px 0;
+  display: flex;
+  overflow-x: scroll;
+  max-width: 100svw;
+  scrollbar-width: 0;
+  height: 320px;
+  padding: 10px 0;
 
-    li {
-        list-style: none;
-        margin-right: 20px;
-        min-width: 200px;
-        height: 300px;
-        display: grid;
+  li {
+    list-style: none;
+    margin-right: 20px;
+    min-width: 200px;
+    height: 300px;
+    display: grid;
 
-        a.movie-thumb {
-            text-decoration: none;
-            position: relative;
-            grid-area: 1/1/2/2;
-            border-radius: 20% 10%;
-            corner-shape: superellipse(1.2);
-            box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
-            overflow: hidden;
-            border: 2px solid black;
+    a.movie-thumb {
+      text-decoration: none;
+      position: relative;
+      grid-area: 1/1/2/2;
+      border-radius: 20% 10%;
+      corner-shape: superellipse(1.2);
+      box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+      overflow: hidden;
+      border: 2px solid black;
 
-            &:focus-within {
-                outline: 4px solid orange;
-                outline-offset: 4px;
-            }
+      &:focus-within {
+        outline: 4px solid orange;
+        outline-offset: 4px;
+      }
 
-            .thumb {
-                position: absolute;
-                inset: 0;
-            }
+      .thumb {
+        position: absolute;
+        inset: 0;
+      }
 
-            .title {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(255, 255, 255, 0.8);
-                text-align: center;
-                color: rebeccapurple;
-                padding: 2px 20px;
-            }
-        }
+      .title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        color: rebeccapurple;
+        padding: 2px 20px;
+      }
     }
+  }
 }
 
-.movie-carousel, .person-carousel {
-    max-width: 100svw;
-    overflow-x: scroll;
-    display: flex;
-    scroll-snap-type: x mandatory;
+.movie-carousel,
+.person-carousel {
+  max-width: 100svw;
+  overflow-x: scroll;
+  display: flex;
+  scroll-snap-type: x mandatory;
 
-    > li {
-        scroll-snap-align: start;
-        min-width: 100svw;
-    }
+  > li {
+    scroll-snap-align: start;
+    min-width: 100svw;
+  }
+}
+
+main > .movie-carousel,
+main > .person-carousel {
+  scroll-timeline-name: --carousel;
+  scroll-timeline-axis: inline;
 }
 
 .teaser a {
-    text-decoration: none;
+  text-decoration: none;
 }
+
+h1, .overview {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  corner-shape: bevel;
+  box-shadow: 2px 2px 1px 3px black;    
+}
+
 
 h1 {
-    text-wrap: wrap;
-    max-width: 80svw;
+  text-wrap: wrap;
+
+  margin: 10px;
 }
 
-.movie-details, .person-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 100svw;
+a {
+    color: black;
+}
+
+.movie-details,
+.person-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 100svw;
 }
 
 .cast {
-    display: flex;
-    overflow-x: scroll;
-    max-width: 100svw;
+  display: flex;
+  overflow-x: scroll;
+  max-width: 100svw;
+  background: rgba(155, 255, 255, 0.2);
 
-    li {
-        padding: 10px;
-        min-width: min-content;
+  li {
+    padding: 10px;
+    min-width: min-content;
 
-        a {
-            text-decoration: none;
-            text-align: center;
-        }
-
-        img {
-            border-radius: 50%;
-            corner-shape: squircle;
-        }
+    a {
+      text-decoration: none;
+      text-align: center;
     }
+
+    img {
+      border-radius: 50%;
+      corner-shape: squircle;
+    }
+  }
 }
 
-@route (movie-details) {
-    #genre-list {
-        display: none;
-    }
+@navigation (movie-details) {
+  #genre-list {
+    display: none;
+  }
 }
 
 #no-support {
-    display: none;
+  display: none;
 }
 
-html[data-supported=false] #no-support {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: yellow;
+html[data-supported="false"] #no-support {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: yellow;
 }
-
 
 h2 {
-    text-align: left;
+  text-align: left;
 }
 
 section {
-    align-self: flex-start;
+  align-self: flex-start;
 }
 
 li {
-    list-style: none;
+  list-style: none;
 }
 
 ul {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 :is(#prev-movie, #next-movie):empty {
-    display: none;
+  display: none;
 }
 
 section.movies {
-    padding-left: 10px;
+  padding-left: 10px;
 }
 
 .hero {
-    width: 300px;
-    height: 450px;
-    border-radius: 20% 10%;
-    corner-shape: superellipse(1.2);
-    box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
-    border: 2px solid black;
+  width: 300px;
+  height: 450px;
+  border-radius: 20% 10%;
+  corner-shape: superellipse(1.2);
+  box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+  border: 2px solid black;
 }
 
 @view-transition {
-    navigation: auto;
+  navigation: auto;
 }
 
-@route (home) {
-    a:is(.nav-trigger, .nav-dest):has(img) {
-        view-transition-name: poster;
+.backdrop {
+  position: fixed;
+  inset: 0;
+  object-fit: cover;
+  z-index: -1;
+  filter: blur(1px) grayscale(0.3) opacity(0.8);
+  view-transition-name: backdrop;
+  animation-timeline: --carousel;
 
-        .title {
-            view-transition-name: title;
-        }
-    }
+  img {
+    inset: 0;
+    position: absolute;
+  }
+
+  .prev,
+  .next {
+    opacity: 0;
+  }
+
+  .current {
+    opacity: 1;
+  }
 }
 
-.default-item .hero {
-            view-transition-name: poster;
-    @route (from: movie-details) {
-        @route (to: movie-details) {
-            view-transition-name: none;
-        }
-    }
+.default-item {
+  scroll-initial-target: nearest;
+  .hero {
+    view-transition-name: attr(data-poster-for type(<custom-ident>));
+  }
 
-    @route (from: person-details) {
-        @route (to: person-details) {
-            view-transition-name: none;
-        }
-    }
-}
-
-.default-item h1 {
+  h1 {
     view-transition-name: title;
-    @route (from: movie-details) {
-        @route (to: movie-details) {
-            view-transition-name: none;
+    @navigation (from: --movie-details) {
+      @navigation (to: --movie-details) {
+        & {
+          view-transition-name: none;
         }
+      }
     }
-
-    @route (from: person-details) {
-        @route (to: person-details) {
-            view-transition-name: none;
+    @navigation (from: --person-details) {
+      @navigation (to: --person-details) {
+        & {
+          view-transition-name: none;
         }
+      }
     }
+  }
 }
 
-@route (from: movie-details) {
-    @route (to: movie-details) {
-        ::view-transition-image-pair(poster) {
-            animation: none;
-        }
-    }
+@keyframes effecty {
+  from {
+    opacity: 0;
+  }
+}
+html::view-transition-group(refreshy) {
+  animation-name: effecty;
+  animation-duration: 3s;
 }
 
-
-@route (from: person-details) {
-    @route (to: person-details) {
-        :root {
-            view-transition-name: rerfreshy;
-        }
+@navigation (from: --movie-details) {
+  @navigation (to: --movie-details) {
+    #main {
+      view-transition-name: rerfreshy;
     }
+    ::view-transition-image-pair(poster) {
+      animation: none;
+    }
+  }
 }
 
-
-@route (from: movie-details) {
-    @route (to: movie-details) {
-        :root {
-            view-transition-name: rerfreshy;
-        }
+@navigation (from: --person-details) {
+  @navigation (to: --person-details) {
+    #main {
+      view-transition-name: rerfreshy;
     }
+  }
+}
+a:link-to(--person-details with navigation-param(person)),
+a:link-to(--movie-details with navigation-param(movie)) {
+  .thumb {
+    view-transition-name: attr(data-poster-for type(<custom-ident>));
+  }
 }
