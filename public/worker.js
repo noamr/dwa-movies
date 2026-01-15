@@ -195,11 +195,10 @@ self.addEventListener("message", async e => {
                     <h1>${name}</h1>
                     <img class="hero" src="${image_path(profile_path, 300)}" data-poster-for="person-${current_person}" width="300">
                     <p class="overview">${biography}</p>
-                    <section contentname="cast" class=mini-carousel>
-                    </section>
+                    <section contentname="cast" class=mini-carousel></section>
                     <section class=movies>
-                    <h2>Credits</h2>
-                    <div contentname="credits"></div>
+                        <h2>Credits</h2>
+                        <div contentname="credits"></div>
                     </section>
                 </article>
             </li>
