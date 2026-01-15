@@ -235,7 +235,7 @@ ul {
   padding: 0;
 }
 
-:is(#prev-movie, #next-movie):empty {
+:is(.prev, .next):empty {
   display: none;
 }
 
@@ -338,4 +338,21 @@ a:link-to(--movie-details with navigation-param(movie)) {
   .thumb {
     view-transition-name: attr(data-poster-for type(<custom-ident>));
   }
+}
+
+@keyframes blurby {
+  from {
+    filter: blur(3px);
+  }
+}
+
+:root:active-view-transition-type(instant) {
+    * {
+        view-transition-name: none !important;
+    }
+
+    &::view-transition-group(root)
+     {
+        animation-name: blurby;
+    }
 }

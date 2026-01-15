@@ -107,7 +107,7 @@ self.addEventListener("message", async e => {
         }) => {
             write_patch("main", "main", `
         <ul class="movie-carousel">
-        <li contentname="prev-movie"></li>
+        <li contentname="prev-movie" class=prev></li>
             <li class="default-item">
                 <article class="movie-details">
                     <img class="backdrop" src="${image_path(backdrop_path, 1280)}" />
@@ -126,7 +126,7 @@ self.addEventListener("message", async e => {
                     </section>
                 </article>
             </li>
-            <li contentname="next-movie"></li>
+            <li contentname="next-movie" class=next></li>
         </ul>
     `)
         });
@@ -184,12 +184,12 @@ self.addEventListener("message", async e => {
         const {
             name,
             biography,
-            profile_path
+            profile_path,
         } = await tmdb_get(`/person/${current_person}`);
 
         write_patch("main", "main", `
         <ul class="person-carousel">
-            <li contentname="prev-person"></li>
+            <li contentname="prev-person" class=prev></li>
             <li class="default-item">
                 <article class="person-details">
                     <h1>${name}</h1>
@@ -203,7 +203,7 @@ self.addEventListener("message", async e => {
                     </section>
                 </article>
             </li>
-            <li contentname="next-person"></li>
+            <li contentname="next-person" class=next></li>
         </ul>
     `);
 
