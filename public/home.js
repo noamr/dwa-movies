@@ -1,5 +1,8 @@
 import { tmdb_get, get_movie_list } from "./helpers.js";
 
+import { DOMGEN } from "./domgen.js";
+const {section, h2, div} = DOMGEN;
+
 export async function render_home({ write_patch, step }) {
     const lists = {
         now_playing: "Now Playing",
@@ -7,15 +10,14 @@ export async function render_home({ write_patch, step }) {
         top_rated: "Top Rated",
         upcoming: "Upcoming"
     }
-    write_patch("main", "main", `
+    write_patch("main", "main", ` 
         ${Object.entries(lists).map(([key, value]) => `
-    <section class=movies>
-      <h2>${value}</h2>
-      <div contentname="list-${key}"></div>
-    </section>
-        `).join("")}
-    <section contentname=genres>
-    </section>
+          ${section({class: "movies"}, 
+            h2(value),
+            div({contentname: `list-${key}`})
+          )}
+          ${section({contentname: "genres"})}
+          `).join("")}
     `);
 
     for (const list of Object.keys(lists)) {
@@ -24,10 +26,10 @@ export async function render_home({ write_patch, step }) {
 
     step(tmdb_get("/genre/movie/list").then(async ({ genres }) => {
         write_patch("section", "genres", `
-            ${genres.map(({ id, name }) => `<section class=movies contentname=genre-${id}>
-                <h2>${name}</h2>
-                <div contentname="list-genre-${id}"></div>
-            </section>`).join("")}
+            ${genres.map(({ id, name }) => section({class: "movies", contentname: `genre-${id}`},
+              h2(name),
+              div({contentname: `list-genre-${id}`})
+            )).join("")}
         `);
 
         // Schedule nested steps

@@ -41,6 +41,8 @@ a {
 h1 {
   text-wrap: wrap;
   margin: 10px;
+  max-width: calc(100% - 120px);
+  font-size: 20px;
 }
 
 h2 {
@@ -48,20 +50,16 @@ h2 {
 }
 
 /* Shared Component Styles */
-h1,
-.overview {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px 20px;
-  border-radius: 10px;
-  box-sizing: border-box;
-  corner-shape: bevel;
-  box-shadow: 2px 2px 1px 3px black;
+.overview, h1 {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* =========================================
    Layout
    ========================================= */
 body > header {
+  position: fixed;
+  z-index: 2;
   /* Navigation Container */
   > nav.top-nav {
     flex: 1;
@@ -71,7 +69,15 @@ body > header {
 
     .logo {
       grid-area: logo;
-
+      font-size: 30px;
+      padding: 5px;
+      margin: 5px;
+      background: white;
+      opacity: 0.9;
+      border: 2px solid grey;
+      corner-shape: squircle;
+      border-radius: 40%;
+      view-transition-name: match-element;
       @navigation (at: --home) {
         display: none;
       }
@@ -150,10 +156,15 @@ section.movies {
 
 /* Overview */
 .overview {
-  height: 18vh;
+  height: 150px;
   max-width: 90vw;
   font-size: 14px;
   overflow: auto;
+  &:empty {
+    visibility: hidden;
+  }
+
+  view-transition-name: overview;
 }
 
 /* Movie List */
@@ -275,7 +286,7 @@ html[data-supported="false"] #no-support {
   display: none;
 }
 
-@navigation (movie-details) {
+@navigation (at: --movie-details) {
   #genre-list {
     display: none;
   }
@@ -404,6 +415,7 @@ a:link-to(--movie-details with navigation-param(movie)) {
 }
 
 .mini-carousel {
+  height: 250px;
   view-transition-name: match-element;
   view-transition-class: mini-carousel;
 }
