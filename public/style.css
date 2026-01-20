@@ -48,7 +48,8 @@ h2 {
 }
 
 /* Shared Component Styles */
-h1, .overview {
+h1,
+.overview {
   background: rgba(255, 255, 255, 0.8);
   padding: 10px 20px;
   border-radius: 10px;
@@ -317,24 +318,11 @@ html[data-supported="false"] #no-support {
   scroll-initial-target: nearest;
   .hero {
     view-transition-name: attr(data-poster-for type(<custom-ident>));
+    view-transition-class: poster;
   }
 
   h1 {
     view-transition-name: title;
-    @navigation (from: --movie-details) {
-      @navigation (to: --movie-details) {
-        & {
-          view-transition-name: none;
-        }
-      }
-    }
-    @navigation (from: --person-details) {
-      @navigation (to: --person-details) {
-        & {
-          view-transition-name: none;
-        }
-      }
-    }
   }
 }
 
@@ -349,17 +337,6 @@ html::view-transition-group(refreshy) {
   animation-duration: 3s;
 }
 
-@navigation (from: --movie-details) {
-  @navigation (to: --movie-details) {
-    #main {
-      view-transition-name: rerfreshy;
-    }
-    ::view-transition-image-pair(poster) {
-      animation: none;
-    }
-  }
-}
-
 @navigation (from: --person-details) {
   @navigation (to: --person-details) {
     #main {
@@ -368,10 +345,33 @@ html::view-transition-group(refreshy) {
   }
 }
 
+@navigation (from: --movie-details) {
+  @navigation (to: --person-details) {
+    @navigation (at: --movie-details) {
+      .default-item .movie-details .hero {
+        view-transition-name: fading-hero;
+        view-transition-class: fading;
+      }
+    }
+  }
+}
+
+@navigation (from: --person-details) {
+  @navigation (to: --movie-details) {
+    @navigation (at: --person-details) {
+      .default-item .person-details .hero {
+        view-transition-name: fading-hero;
+        view-transition-class: fading;
+      }
+    }
+  }
+}
+
 a:link-to(--person-details with navigation-param(person)),
 a:link-to(--movie-details with navigation-param(movie)) {
   .thumb {
     view-transition-name: attr(data-poster-for type(<custom-ident>));
+    view-transition-class: poster;
   }
 }
 
@@ -382,12 +382,47 @@ a:link-to(--movie-details with navigation-param(movie)) {
 }
 
 :root:active-view-transition-type(instant) {
-    * {
-        view-transition-name: none !important;
-    }
+  * {
+    view-transition-name: none !important;
+  }
 
-    &::view-transition-group(root)
-     {
-        animation-name: blurby;
+  &::view-transition-group(root) {
+    animation-name: blurby;
+  }
+}
+
+:root::view-transition-group(backdrop) {
+  z-index: -1;
+}
+
+:root {
+  view-transition-name: none;
+}
+
+:root::view-transition-group(*.mini-carousel) {
+  opacity: 0;
+}
+
+.mini-carousel {
+  view-transition-name: match-element;
+  view-transition-class: mini-carousel;
+}
+
+:root[data-nav-state="committed"] {
+  &::view-transition-old(*.poster),
+  &::view-transition-new(*.poster),
+  &::view-transition-image-pair(*.poster) {
+    animation-timing-function: step-end;
+  }
+}
+:root:not([data-nav-state="committed"]) {
+  a:link-to(--person-details with navigation-param(person)),
+  a:link-to(--movie-details with navigation-param(movie)) {
+    .thumb {
+      border-radius: 20% 10%;
+      corner-shape: superellipse(1.2);
+      box-shadow: 4px 4px 2px 0 rgba(255, 122, 173, 0.4);
+      border: 2px solid black;
     }
+  }
 }
