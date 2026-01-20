@@ -1,4 +1,4 @@
-import { tmdb_get, image_path, cache_movie, cache_person } from "./helpers.js";
+import { tmdb_get, image_path } from "./helpers.js";
 
 import { DOMGEN } from "./domgen.js";
 
@@ -11,9 +11,7 @@ export async function render_person({ id, current_list, write_patch, step }) {
         profile_path,
     } = await tmdb_get(`/person/${id}`);
 
-    cache_person(id, {name, profile_path});
-
-    write_patch("main", "main", 
+    const skeleton = write_patch("main", "main", 
       ul({class: "person-carousel"},
         li({contentname: "prev-person", class: "prev"}),
         li({class: "default-item"},
@@ -31,13 +29,16 @@ export async function render_person({ id, current_list, write_patch, step }) {
         li({contentname: "next-person", class: "next"})
       )
     );
+    const write_after_skeleton = (...args) => skeleton.then(() => write_patch(...args));
+
+    const person_id = id;
 
     step(tmdb_get(`/person/${id}/credits`).then(async ({ cast }) =>
-        write_patch("section", "cast", 
+        write_after_skeleton("section", "cast", 
           ul({class: "cast"}, 
             ...cast.map(({ title, poster_path, id, character }) =>
                 li({class: "cast"}, 
-                    a({href: `/movie/${id}?list=/person/${id}/credits`}, 
+                    a({href: `/movie/${id}?list=/person/${person_id}/credits`}, 
                         img({class: "movie thumb", "data-poster-for": `movie-${id}`, src: image_path(poster_path, 300), width: 80, height: 120}),
                         span(character), " in ", span(title)
                     )
@@ -48,7 +49,7 @@ export async function render_person({ id, current_list, write_patch, step }) {
 
     step(tmdb_get(current_list).then(async ({ cast }) => {
         const results = cast;
-        const index = results.findIndex(r => r.id == id);
+        const index = results.findIndex(r => r.id == person_id);
         
         function person_slide({ id, name, profile_path }) {
             return article({class: "person-details"},
@@ -60,11 +61,12 @@ export async function render_person({ id, current_list, write_patch, step }) {
 
         if (index < results.length - 1) {
             const next = results[index + 1];
-            write_patch("li", "next-person", person_slide(next));
+            write_after_skeleton("li", "next-person", person_slide(next));
         }
         if (index > 0) {
             const prev = results[index - 1];
-            write_patch("li", "prev-person", person_slide(prev));
+            write_after_skeleton("li", "prev-person", person_slide(prev));
         }
     }));
+    await skeleton;
 }

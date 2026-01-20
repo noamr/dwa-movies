@@ -163,7 +163,7 @@ section.movies {
   &:empty {
     visibility: hidden;
   }
-
+} .default-item .overview {
   view-transition-name: overview;
 }
 
