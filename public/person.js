@@ -1,6 +1,6 @@
 import { tmdb_get, image_path } from "./helpers.js";
 
-import { DOMGEN } from "./domgen.js";
+import { DOMGEN, Start } from "./domgen.js";
 
 const {div, li, article, img, p, section, h1, h2, ul, a, span} = DOMGEN;
 
@@ -11,22 +11,22 @@ export async function render_person({ id, current_list, write_patch, step }) {
         profile_path,
     } = await tmdb_get(`/person/${id}`);
 
-    const skeleton = write_patch("main", "main", 
+    const skeleton = write_patch("main", 
       ul({class: "person-carousel"},
-        li({contentname: "prev-person", class: "prev"}),
+        li({marker: "prev-person", class: "prev"}, Start("prev-person")),
         li({class: "default-item"},
           article({class: "person-details"},
             h1(name),
             img({class: "hero", src: image_path(profile_path, 300), "data-poster-for": `person-${id}`, width: 300}),
             p({class: "overview"}, biography),
-            section({contentname: "cast", class: "mini-carousel"}),
+            section({marker: "cast", class: "mini-carousel"}, Start("cast")),
             section({class: "movies"},
               h2("Credits"),
-              div({contentname: "credits"})
+              div({marker: "credits"}, Start("credits"))
             )
           )
         ),
-        li({contentname: "next-person", class: "next"})
+        li({marker: "next-person", class: "next"}, Start("next-person"))
       )
     );
     const write_after_skeleton = (...args) => skeleton.then(() => write_patch(...args));
@@ -34,7 +34,7 @@ export async function render_person({ id, current_list, write_patch, step }) {
     const person_id = id;
 
     step(tmdb_get(`/person/${id}/credits`).then(async ({ cast }) =>
-        write_after_skeleton("section", "cast", 
+        write_after_skeleton("cast", 
           ul({class: "cast"}, 
             ...cast.map(({ title, poster_path, id, character }) =>
                 li({class: "cast"}, 
@@ -61,11 +61,11 @@ export async function render_person({ id, current_list, write_patch, step }) {
 
         if (index < results.length - 1) {
             const next = results[index + 1];
-            write_after_skeleton("li", "next-person", person_slide(next));
+            write_after_skeleton("next-person", person_slide(next));
         }
         if (index > 0) {
             const prev = results[index - 1];
-            write_after_skeleton("li", "prev-person", person_slide(prev));
+            write_after_skeleton("prev-person", person_slide(prev));
         }
     }));
     await skeleton;

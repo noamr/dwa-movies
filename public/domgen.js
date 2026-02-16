@@ -1,6 +1,6 @@
 export const DOMGEN = new Proxy({}, {
     get(target, tagName) {
-      const is_self_closing = ["img", "br", "hr", "input", "meta", "link", "area", "base", "col", "embed", "keygen", "param", "source", "track", "wbr"].includes(tagName);
+      const is_self_closing = tagName.startsWith("?") || ["img", "br", "hr", "input", "meta", "link", "area", "base", "col", "embed", "keygen", "param", "source", "track", "wbr"].includes(tagName);
       const result = (maybeAttributes, ...children) => {
         let attributes = {};
         if (typeof maybeAttributes === "object") {
@@ -15,3 +15,7 @@ export const DOMGEN = new Proxy({}, {
       return result;
     }
 })
+
+export const Marker = (name) => `<?marker name="${name}"?>`;
+export const Start = (name) => `<?start name="${name}"?>`;
+export const End = (name) => `<?end name="${name}"?>`;

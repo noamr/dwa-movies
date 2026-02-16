@@ -24,7 +24,7 @@ export function image_path(path, width = null) {
 }
 
 export function get_movie_list(step, url, outlet, write_patch) {
-    step(tmdb_get(url).then(({ results }) => write_patch("div", `list-${outlet}`, `
+    step(tmdb_get(url).then(({ results }) => write_patch(`list-${outlet}`, `
         <ul class=movie-list>
         ${results.map(({ id, poster_path, title }) => `
             <li>

@@ -14,12 +14,12 @@ console.log("Worker ready!");
 
 postMessage("ready");
 
-function create_patch(tagname, name, content, method="replace-children") {
+function create_patch(name, content) {
+    console.log({name, content})
     return `
-        <template contentmethod="${method}"><${tagname} contentname="${name}">
-            ${content}
-        </${tagname}></template>
-    `;
+    <template for="${name}">
+        <?start name="${name}">${content}<?end name="${name}">
+    </template>`;
 }
 
 async function process_navigation({
@@ -62,6 +62,6 @@ self.addEventListener("message", async e => {
         url,
         commit: () => port.postMessage("commit"),
         finish: () => port.postMessage("finish"),
-        write_patch: (tagname, name, content) => writer.write(create_patch(tagname, name, content))
+        write_patch: (name, content) => writer.write(create_patch(name, content))
     });
 });
