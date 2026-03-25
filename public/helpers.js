@@ -23,8 +23,10 @@ export function image_path(path, width = null) {
     return `https://image.tmdb.org/t/p/${width ? `w${width}` : 'original'}/${path}`;
 }
 
-export function get_movie_list(step, url, outlet, write_patch) {
-    step(tmdb_get(url).then(({ results }) => write_patch(`list-${outlet}`, `
+export function get_movie_list(url) {
+    return tmdb_get(url).then((data) => {
+        const results = data.results || data.cast || [];
+        return `
         <ul class=movie-list>
         ${results.map(({ id, poster_path, title }) => `
             <li>
@@ -35,5 +37,5 @@ export function get_movie_list(step, url, outlet, write_patch) {
             </li>
         `).join("")}
         </ul>
-    `)));
+    `});
 }

@@ -7,7 +7,7 @@ try {
     const result = await tmdb_get("/authentication/guest_session/new");
     self.guest_session_id = result.guest_session_id;
 } catch (e) {
-    alert("Could not log in");
+    console.error("Could not log in", e);
 }
 
 console.log("Worker ready!");
@@ -15,12 +15,13 @@ console.log("Worker ready!");
 postMessage("ready");
 
 function create_patch(name, content) {
-    console.log({name, content})
     return `
     <template for="${name}">
         <?start name="${name}">${content}<?end name="${name}">
     </template>`;
 }
+
+let counter = 0;
 
 async function process_navigation({
     url, commit, finish, write_patch
@@ -34,13 +35,22 @@ async function process_navigation({
     const steps = [];
     const step = (promise) => steps.push(promise);
 
-    if (home_pattern.test(url))
-        await render_home({ write_patch, step });
-    else if (movie_pattern.test(url))
-        await render_movie({ id: movie_pattern.exec(url)?.pathname?.groups?.id, current_list, write_patch, step });
-    else if (person_pattern.test(url))
-        await render_person({ id: person_pattern.exec(url)?.pathname?.groups?.id, current_list, write_patch, step });
+    const Async = (promise) => {
+        const name = `async-${counter++}`;
+        step(promise.then((value) => write_patch(name, value)));
+        return `<?start name="${name}"?><?end>`;
+    };
 
+    let output = "";
+
+    if (home_pattern.test(url))
+        output = await render_home({ Async });
+    else if (movie_pattern.test(url))
+        output = await render_movie({ id: movie_pattern.exec(url)?.pathname?.groups?.id, current_list, Async });
+    else if (person_pattern.test(url))
+        output = await render_person({ id: person_pattern.exec(url)?.pathname?.groups?.id, current_list, Async });
+
+    write_patch("main", output);
     commit();
 
     // Drain the step queue (handling new steps added during execution)

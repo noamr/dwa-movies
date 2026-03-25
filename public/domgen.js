@@ -15,7 +15,3 @@ export const DOMGEN = new Proxy({}, {
       return result;
     }
 })
-
-export const Marker = (name) => `<?marker name="${name}"?>`;
-export const Start = (name) => `<?start name="${name}"?>`;
-export const End = () => `<?end?>`;

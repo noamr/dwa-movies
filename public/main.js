@@ -42,7 +42,6 @@ worker.addEventListener("message", async () => {
                 const navigation_finished = Promise.withResolvers();
                 const transition = document.startViewTransition({
                     update: () => {
-                        console.log("VT", e.destination.url);
                         const { committed, finished } = patch_navigation(e.destination.url);
                         finished.promise.then(() => navigation_finished.resolve());
                         return committed.promise;
