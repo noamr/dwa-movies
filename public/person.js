@@ -13,20 +13,20 @@ export async function render_person({ id, current_list, write_patch, step }) {
 
     const skeleton = write_patch("main", 
       ul({class: "person-carousel"},
-        li({marker: "prev-person", class: "prev"}, Start("prev-person")),
+        li({class: "prev"}, Start("prev-person")),
         li({class: "default-item"},
           article({class: "person-details"},
             h1(name),
             img({class: "hero", src: image_path(profile_path, 300), "data-poster-for": `person-${id}`, width: 300}),
             p({class: "overview"}, biography),
-            section({marker: "cast", class: "mini-carousel"}, Start("cast")),
+            section({class: "mini-carousel"}, Start("cast")),
             section({class: "movies"},
               h2("Credits"),
-              div({marker: "credits"}, Start("credits"))
+              div(Start("credits"))
             )
           )
         ),
-        li({marker: "next-person", class: "next"}, Start("next-person"))
+        li({class: "next"}, Start("next-person"))
       )
     );
     const write_after_skeleton = (...args) => skeleton.then(() => write_patch(...args));

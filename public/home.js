@@ -13,9 +13,9 @@ export async function render_home({ write_patch, step }) {
         ${Object.entries(lists).map(([key, value]) => `
           ${section({class: "movies"}, 
             h2(value),
-            div({marker: `list-${key}`}, Start(`list-${key}`))
+            div(Start(`list-${key}`))
           )}
-          ${section({marker: "genres"}, Start("genres"))}
+          ${section(Start("genres"))}
           `).join("")}
     `);
 
@@ -25,11 +25,11 @@ export async function render_home({ write_patch, step }) {
 
     step(tmdb_get("/genre/movie/list").then(async ({ genres }) => {
         write_patch("genres", `
-            ${genres.map(({ id, name }) => section({class: "movies", marker: `genre-${id}`},
+            ${genres.map(({ id, name }) => section({class: "movies"},
               Start(`genre-${id}`),
               h2(name),
-              div({marker: `list-genre-${id}`}, Start(`list-genre-${id}`)),
-              End(`genre-${id}`)
+              div(Start(`list-genre-${id}`)),
+              End()
             )).join("")}
         `);
 

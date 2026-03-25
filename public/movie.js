@@ -8,25 +8,25 @@ export async function render_movie({ id, current_list, write_patch, step, show_s
   const skeleton = tmdb_get(`/movie/${id}`).then(({ backdrop_path, title, overview, poster_path }) =>
         write_patch("main", 
           ul({class: "movie-carousel"},
-            li({marker: "prev-movie", class: "prev"}, Start("prev-movie")),
+            li({class: "prev"}, Start("prev-movie")),
             li({class: "default-item"}, 
               article({class: "movie-details"},
                 img({class: "backdrop", src: image_path(backdrop_path, 1280)}),
                 h1(title),
                 img({class: "hero", src: image_path(poster_path, 300), "data-poster-for": `movie-${id}`}),
                 p({class: "overview"}, overview),
-                section({class: "mini-carousel", marker: "cast"}, Start("cast")),
+                section({class: "mini-carousel"}, Start("cast")),
                 section({class: "movies"}, 
                   h2("Related"),
-                  div({marker: "list-similar"}, Start("list-similar"))
+                  div(Start("list-similar"))
                 ),
                 section({class: "movies"}, 
                   h2("Recommended"),
-                  div({marker: "list-recommendations"}, Start("list-recommendations"))
+                  div(Start("list-recommendations"))
                 )
               )
             ),
-            li({class: "next", marker: "next-movie"}, Start("next-movie"))
+            li({class: "next"}, Start("next-movie"))
           )
         ));
   const write_after_skeleton = (...args) => skeleton.then(() => write_patch(...args));
