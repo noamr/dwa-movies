@@ -43,8 +43,10 @@ async function process_navigation({
 
     let output = "";
 
+    const search = new URL(url).searchParams;
+
     if (home_pattern.test(url))
-        output = await render_home({ Async });
+        output = await render_home({ Async, search });
     else if (movie_pattern.test(url))
         output = await render_movie({ id: movie_pattern.exec(url)?.pathname?.groups?.id, current_list, Async });
     else if (person_pattern.test(url))

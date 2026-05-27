@@ -438,3 +438,10 @@ a:link-to(--movie-details with navigation-param(movie)) {
     }
   }
 }
+
+form[name=search] {
+  display: none;
+  @navigation (at: --home) {
+    display: block;
+  }
+}

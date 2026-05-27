@@ -26,6 +26,12 @@ function patch_navigation(url) {
     return { committed, finished }
 }
 
+document.body.addEventListener("input", e => {
+    const form = e.target.form;
+    if (form.hasAttribute("autosubmit"))
+        form.requestSubmit();
+});
+
 worker.addEventListener("message", async () => {
     await patch_navigation(location.href).finished;
 
@@ -50,7 +56,8 @@ worker.addEventListener("message", async () => {
                 });
                 controller.addHandler(() => Promise.all([transition.finished, navigation_finished.promise]));
                 return transition.updateCallbackDone;
-            }
+            },
+            focusReset: "manual"
         });
     });
 }, { once: true });
